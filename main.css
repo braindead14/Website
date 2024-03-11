@@ -1,5 +1,5 @@
 * {
-    background-color:#2b2a33;
+    background-color:#202022;
     color:#fbfbfe;
 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -8,4 +8,8 @@
 
 .hyperlink {
     color: #4b4bff;
+}
+
+canvas {
+    border: 1px solid black;
 }
