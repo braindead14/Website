@@ -4,7 +4,7 @@ function draw() {
     const canvas = document.getElementById("map");
     const ctx = canvas.getContext("2d");
 
-    const targetSize = window.innerWidth * 0.2;
+    const targetSize = Math.min(window.innerWidth * 0.8, window.innerHeight * 0.8);
     const randomCountry = Math.floor(Math.random() * 251);       // Random number between [0, 251]
     let countryName;
 
