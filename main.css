@@ -3,13 +3,37 @@
     color:#fbfbfe;
 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    
+    font-weight: 600;
 }
 
 a {
     color: #4b4bff;
 }
 
-canvas {
+h1 {
+    font-weight: bold;
+}
+
+/* canvas {
     border: 1px solid black;
+} */
+
+button {
+    background-color: #21424c;
+    border-radius: 10%;
+    border-color: #21424c;
+    border-style: solid;
+}
+
+button:hover {
+    background-color: #254b57;
+    border-color: #254b57;
+}
+
+#nextButton {
+    visibility: hidden;
+}
+
+input {
+    border-color: #21424c;
 }
