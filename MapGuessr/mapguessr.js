@@ -1,12 +1,19 @@
 'use strict';
 
+let globalCountryName = ""; // Global variable to store the country name
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Ensure the DOM is fully loaded before attaching listeners
+    setupEventListeners();
+    draw();
+});
+
 function draw() {
     const canvas = document.getElementById("map");
     const ctx = canvas.getContext("2d");
 
-    const targetSize = Math.min(window.innerWidth * 0.8, window.innerHeight * 0.8);
+    const targetSize = Math.min(window.innerWidth * 0.6, window.innerHeight * 0.6);
     const randomCountry = Math.floor(Math.random() * 251);       // Random number between [0, 251]
-    let countryName;
 
     ctx.canvas.width  = targetSize;
     ctx.canvas.height = ctx.canvas.width;
@@ -18,26 +25,26 @@ function draw() {
         .then(response => response.json())
         .then(data => {
             handleData(ctx, data, targetSize, randomCountry); 
-            countryName = data[randomCountry]["cntry_name"];
+            globalCountryName = data[randomCountry]["cntry_name"];
 
-            const textInputGuess = document.getElementById("guess");
-            const skipButton = document.getElementById("skipButton");
-            textInputGuess.countryName = countryName;
-            skipButton.countryName = countryName;
+            fillDropdown(data);
         })
         .catch(error => console.error('Error fetching JSON:', error));
-    
+}
+
+function setupEventListeners() {
     const textInputGuess = document.getElementById("guess");
     const skipButton = document.getElementById("skipButton");
     const nextButton = document.getElementById("nextButton");
 
+    // Add event listeners
     textInputGuess.addEventListener("keypress", guessHandler);
     skipButton.addEventListener("click", skipButtonHandler);
     nextButton.addEventListener("click", nextButtonHandler);
 }
 
 function handleData(ctx, data, targetSize, code) {
-    const countryNameDiv = document.getElementById("countryName");
+    // const countryNameDiv = document.getElementById("countryName");
 
     if (data[code]["geo_shape"]["geometry"]["type"] == "Polygon") {
         plotPolygon(ctx, data[code]["geo_shape"]["geometry"]["coordinates"][0], targetSize);
@@ -183,15 +190,13 @@ function computeScaleFactor(deltaLat, deltaLon, targetSize) {
 }
 
 function skipButtonHandler(evt) {
-    const countryName = evt.currentTarget.countryName;
-
     // Reset input field text
     const textInputGuess = document.getElementById("guess");
     textInputGuess.value = "";
 
     // Show right answer
     const guessResultDiv = document.getElementById("guessResult");
-    guessResultDiv.innerText = "The country was " + countryName + "!";
+    guessResultDiv.innerText = "The country was " + globalCountryName + "!";
 
     // Redraw
     draw();
@@ -214,20 +219,71 @@ function nextButtonHandler() {
 
 function guessHandler(evt) {
     if (evt.key === 'Enter') {
-        const guessResultDiv = document.getElementById("guessResult");
-        const correctCountry = evt.currentTarget.countryName;
-        const textInputGuess = document.getElementById("guess");
-        // guessResultDiv.innerText = evt.currentTarget.countryName;
-
-        const guess = textInputGuess.value;
-
-        if (!guess.localeCompare(correctCountry, undefined, { sensitivity: 'accent' })) {
-            guessResultDiv.innerText = "Correct! You get an extra brownie point";
-            document.getElementById("nextButton").style.visibility = "visible";
-        } else {
-            guessResultDiv.innerText = "Wrong answer, try again";
-        }
+        verifyGuess();
     }
 }
 
-window.addEventListener("load", draw);
+function verifyGuess() {
+    const guessResultDiv = document.getElementById("guessResult");
+    //let textInputGuess = evt.currentTarget.value;
+    let textInputGuess = document.getElementById("guess").value;
+
+    if (textInputGuess.localeCompare(globalCountryName, undefined, { sensitivity: 'accent' }) === 0) {
+        guessResultDiv.innerText = "Correct! You get an extra brownie point";
+        document.getElementById("nextButton").style.visibility = "visible";
+    } else {
+        guessResultDiv.innerText = "Wrong answer, try again";
+    }
+}
+
+function dropdownButtonHandler(countryName) {
+    // Fill in the textbox
+    const textInputGuess = document.getElementById("guess");
+    textInputGuess.value = countryName;
+
+    // Trigger the verifyGuess function
+    verifyGuess();
+}
+
+function dropdownFilterFunction(evt) {
+    // The value in the text box
+    const filter = evt.currentTarget.value.toUpperCase();
+    const myDropdownDiv = document.getElementById("myDropdown");
+    const a = myDropdownDiv.getElementsByTagName("a");
+
+    // Display at most 5 entries
+    let numberOfElements = Math.min(a.length, 5);
+    let amountOfResultsShown = 0;
+
+    for (let i = 0; i < a.length; i++) {
+        const txtValue = a[i].textContent || a[i].innerText;     
+        if (txtValue.toUpperCase().includes(filter)) {
+            a[i].style.display = "";
+            amountOfResultsShown++;
+        } else {
+            a[i].style.display = "none";
+        }
+
+        if (amountOfResultsShown >= numberOfElements)
+            break;
+    }
+}
+
+function fillDropdown(data) {
+    const myDropdownDiv = document.getElementById("myDropdown");
+    // Clear all previous results
+    myDropdownDiv.innerHTML = "";
+
+    // Fill all countries
+    for (let i = 0; i < data.length; i++) {
+        let name = data[i]["cntry_name"].toString();
+
+        myDropdownDiv.innerHTML += `<a href="javascript:void(0)" onclick="dropdownButtonHandler('${name}')">${name}<br></a>`;
+    }
+
+    // Set them all invisible
+    const a = myDropdownDiv.getElementsByTagName("a");
+    for (let i = 0; i < a.length; i++) {
+        a[i].style.display = "none";
+    }
+}

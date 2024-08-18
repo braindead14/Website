@@ -32,10 +32,6 @@ button:hover {
     border-color: #254b57;
 }
 
-#nextButton {
-    visibility: hidden;
-}
-
 input {
     border-color: #21424c;
 
