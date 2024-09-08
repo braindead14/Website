@@ -1,0 +1,34 @@
+/* Video should take up the entire viewport */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Full-screen video settings */
+.background-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw; /* Full width of the viewport */
+    height: 100vh; /* Full height of the viewport */
+    z-index: -1; /* Send video to the background */
+    /*filter: brightness(50%); /* Reduce brightness */
+    opacity: 0.2; /* Optional: lower opacity */
+    object-fit: cover; /* Ensure the video covers the entire screen without distortion */
+    background-size: cover;
+}
+
+/* Center the timer on the screen */
+h1.timer {
+    font-size: 10vw; /* Use viewport width units for scaling */
+    font-weight: bold;
+    text-align: center;
+    color: white; /* Set text color to stand out from video */
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
